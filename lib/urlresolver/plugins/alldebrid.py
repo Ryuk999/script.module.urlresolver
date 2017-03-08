@@ -46,20 +46,20 @@ class AllDebridResolver(UrlResolver):
         html = self.net.http_GET(url).content
         if html == 'login':
             raise ResolverError('alldebrid: Authentication Error')
-        
+ 
         try:
             js_data = json.loads(html)
             if 'error' in js_data and js_data['error']:
                 raise ResolverError('alldebrid: %s' % (js_data['error']))
             
-            if 'streaming' in js_data:
-                return helpers.pick_source(js_data['streaming'].items())
+            if 'link' in js_data:
+                return js_data['link'].encode('utf8')
         except ResolverError:
             raise
         except:
             match = re.search('''<a\s+class=["']link_dl['"]\s+href=["']([^'"]+)''', html)
             if match:
-                return match.group(1)
+                return match.group(1).encode('utf8')
         
         raise ResolverError('alldebrid: no stream returned')
 
